@@ -7,7 +7,7 @@ import com.erm.test.cleaner.InsertQueryHolder;
 import com.erm.test.cleaner.InsertQueryProvider;
 import com.erm.test.cleaner.SafeCleanWrapper;
 import com.erm.test.cleaner.TableNameExtractor;
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.erm.test.cleaner.TableRestorer;
 import org.springframework.transaction.annotation.Transactional;
 
 public class BasedOnQueryDbStateRestorer implements DbStateRestorer {
@@ -15,17 +15,16 @@ public class BasedOnQueryDbStateRestorer implements DbStateRestorer {
     private final ExecutedQueryHolder executedQueryHolder;
     private final TableNameExtractor tableNameExtractor;
     private final InsertQueryHolder insertQueryHolder;
-    private final JdbcTemplate jdbcTemplate;
+    private final TableRestorer tableRestorer;
     private final InsertQueryProvider insertQueryProvider;
     private final SafeCleanWrapper safeCleanWrapper;
 
     public BasedOnQueryDbStateRestorer(ExecutedQueryHolder executedQueryHolder, TableNameExtractor tableNameExtractor,
-            InsertQueryHolder insertQueryHolder, JdbcTemplate jdbcTemplate, InsertQueryProvider insertQueryProvider,
-            SafeCleanWrapper safeCleanWrapper) {
+            InsertQueryHolder insertQueryHolder, TableRestorer tableRestorer, InsertQueryProvider insertQueryProvider, SafeCleanWrapper safeCleanWrapper) {
         this.executedQueryHolder = executedQueryHolder;
         this.tableNameExtractor = tableNameExtractor;
         this.insertQueryHolder = insertQueryHolder;
-        this.jdbcTemplate = jdbcTemplate;
+        this.tableRestorer = tableRestorer;
         this.insertQueryProvider = insertQueryProvider;
         this.safeCleanWrapper = safeCleanWrapper;
     }
@@ -37,10 +36,7 @@ public class BasedOnQueryDbStateRestorer implements DbStateRestorer {
         executedQueryHolder.getExecutedQueries().forEach(query -> {
             ParsingResult result = tableNameExtractor.extractTableName(query);
             if (result.statementType().isModifying()) {
-                result.tableNames().forEach(tableName -> {
-                    jdbcTemplate.update("TRUNCATE TABLE " + tableName);
-                    insertQueryHolder.getQueriesForTable(tableName).forEach(jdbcTemplate::update);
-                });
+                result.tableNames().forEach(tableRestorer::restore);
             }
         });
         executedQueryHolder.clean();

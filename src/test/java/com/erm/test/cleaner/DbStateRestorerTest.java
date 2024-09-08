@@ -4,15 +4,11 @@ import com.erm.test.cleaner.impl.BasedOnQueryDbStateRestorer;
 import com.erm.test.cleaner.impl.ParsingResult;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import static com.erm.test.cleaner.StatementType.INSERT;
-import static com.erm.test.cleaner.StatementType.SELECT;
-import static com.erm.test.cleaner.StatementType.UPDATE;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -28,7 +24,7 @@ class DbStateRestorerTest {
     private ExecutedQueryHolder executedQueryHolder;
     private TableNameExtractor tableNameExtractor;
     private InsertQueryHolder insertQueryHolder;
-    private JdbcTemplate jdbcTemplate;
+    private TableRestorer tableRestorer;
     private InsertQueryProvider insertQueryProvider;
     private SafeCleanWrapper safeCleanWrapper;
 
@@ -39,14 +35,14 @@ class DbStateRestorerTest {
         executedQueryHolder = mock(ExecutedQueryHolder.class);
         tableNameExtractor = mock(TableNameExtractor.class);
         insertQueryHolder = mock(InsertQueryHolder.class);
-        jdbcTemplate = mock(JdbcTemplate.class);
+        tableRestorer = mock(TableRestorer.class);
         insertQueryProvider = mock(InsertQueryProvider.class);
         safeCleanWrapper = mock(SafeCleanWrapper.class);
         dbStateRestorer = new BasedOnQueryDbStateRestorer(
                 executedQueryHolder,
                 tableNameExtractor,
                 insertQueryHolder,
-                jdbcTemplate,
+                tableRestorer,
                 insertQueryProvider,
                 safeCleanWrapper
         );
@@ -61,8 +57,6 @@ class DbStateRestorerTest {
         dbStateRestorer.restore();
         verify(executedQueryHolder).getExecutedQueries();
         verify(tableNameExtractor).extractTableName(TEST_EXECUTED_QUERY);
-        verify(insertQueryHolder).getQueriesForTable(TEST_TABLE_NAME);
-        verify(jdbcTemplate).update("TRUNCATE TABLE " + TEST_TABLE_NAME);
         verify(executedQueryHolder).clean();
         verify(safeCleanWrapper).before();
         verify(safeCleanWrapper).after();
@@ -77,9 +71,7 @@ class DbStateRestorerTest {
         dbStateRestorer.restore();
         verify(executedQueryHolder).getExecutedQueries();
         verify(tableNameExtractor).extractTableName(TEST_EXECUTED_QUERY);
-        verify(insertQueryHolder).getQueriesForTable(TEST_TABLE_NAME);
-        verify(jdbcTemplate).update("TRUNCATE TABLE " + TEST_TABLE_NAME);
-        verify(jdbcTemplate).update(TEST_INSERT);
+        verify(tableRestorer).restore(TEST_TABLE_NAME);
         verify(executedQueryHolder).clean();
         verify(safeCleanWrapper).before();
         verify(safeCleanWrapper).after();

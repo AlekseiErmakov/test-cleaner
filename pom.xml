@@ -8,10 +8,10 @@
         <version>3.3.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.ipa.test.cleaner</groupId>
-    <artifactId>ipa-starter-test-cleaner</artifactId>
+    <groupId>com.erm.test.cleaner</groupId>
+    <artifactId>starter-test-cleaner</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ipa-starter-test-cleaner</name>
+    <name>starter-test-cleaner</name>
     <description>Demo project for Spring Boot</description>
     <url/>
     <licenses>
