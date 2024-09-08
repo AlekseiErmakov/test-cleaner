@@ -23,23 +23,12 @@ public class BashContainerCommand implements ContainerCommand {
 
         private static final String BASH = "bash";
         private static final String C = "-c";
-        private String userName;
-        private String password;
         private String applicationName;
         private List<String> arguments;
 
         private BashCommandBuilder() {
         }
 
-        public BashCommandBuilder withUserName(String userName) {
-            this.userName = userName;
-            return this;
-        }
-
-        public BashCommandBuilder withPassword(String password) {
-            this.password = password;
-            return this;
-        }
 
         public BashCommandBuilder withArguments(List<String> arguments) {
             this.arguments = arguments;
@@ -52,8 +41,7 @@ public class BashContainerCommand implements ContainerCommand {
         }
 
         public BashContainerCommand build() {
-            return new BashContainerCommand(BASH, C, applicationName + " -u " + userName + " --password="
-                    + password + " " + String.join(" ", arguments));
+            return new BashContainerCommand(BASH, C, applicationName + String.join(" ", arguments));
         }
     }
 }

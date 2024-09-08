@@ -1,5 +1,6 @@
 package com.erm.test.cleaner.impl;
 
+import com.erm.test.cleaner.StatementType;
 import com.erm.test.cleaner.TableNameExtractor;
 import java.util.Set;
 import net.sf.jsqlparser.JSQLParserException;
@@ -22,6 +23,6 @@ public class JSqlTableNameExtractor implements TableNameExtractor {
         Statement statement = parse(query);
         TablesNamesFinder tablesNamesFinder = new TablesNamesFinder();
         Set<String> tables = tablesNamesFinder.getTables(statement);
-        return new ParsingResult(tables, JSqlParserStatementTypeMapper.mapToStatementType(statement));
+        return new ParsingResult(tables, StatementType.from(statement));
     }
 }

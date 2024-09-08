@@ -1,7 +1,7 @@
 package com.erm.test.cleaner;
 
-import com.erm.test.cleaner.impl.ExecutedQueryHolderImpl;
-import com.erm.test.cleaner.impl.InsertQueryHolderImpl;
+import com.erm.test.cleaner.impl.InMemoryExecutedQueryHolder;
+import com.erm.test.cleaner.impl.InMemoryInsertQueryHolder;
 import com.erm.test.cleaner.listener.TestQueryListener;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +16,7 @@ public class CleanerAutoConfiguration {
 
     @Bean
     public ExecutedQueryHolder executedQueryHolder() {
-        return new ExecutedQueryHolderImpl();
+        return new InMemoryExecutedQueryHolder();
     }
 
     @Bean
@@ -26,6 +26,6 @@ public class CleanerAutoConfiguration {
 
     @Bean
     public InsertQueryHolder insertQueryHolder() {
-        return new InsertQueryHolderImpl();
+        return new InMemoryInsertQueryHolder();
     }
 }

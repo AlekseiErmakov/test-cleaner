@@ -1,8 +1,9 @@
 package com.erm.test.cleaner;
 
 import java.util.List;
+import java.util.Map;
 
 public interface InsertQueryProvider {
 
-    List<String> getInsertQueries();
+    Map<String, List<String>> getInsertQueries();
 }

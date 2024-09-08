@@ -39,7 +39,7 @@ public class BasedOnQueryDbStateRestorer implements DbStateRestorer {
             if (result.statementType().isModifying()) {
                 result.tableNames().forEach(tableName -> {
                     jdbcTemplate.update("TRUNCATE TABLE " + tableName);
-                    insertQueryHolder.getQueryForTable(tableName).ifPresent(jdbcTemplate::update);
+                    insertQueryHolder.getQueriesForTable(tableName).forEach(jdbcTemplate::update);
                 });
             }
         });
@@ -49,11 +49,7 @@ public class BasedOnQueryDbStateRestorer implements DbStateRestorer {
 
     @Override
     public void createBackup() {
-        insertQueryProvider.getInsertQueries().forEach(query -> {
-            ParsingResult result = tableNameExtractor.extractTableName(query);
-            if (result.statementType().isModifying()) {
-                result.tableNames().forEach(tableName -> insertQueryHolder.addQueryForTable(tableName, query));
-            }
-        });
+        insertQueryProvider.getInsertQueries()
+                .forEach((tableName, queries) -> queries.forEach(query -> insertQueryHolder.addQueryForTable(tableName, query)));
     }
 }

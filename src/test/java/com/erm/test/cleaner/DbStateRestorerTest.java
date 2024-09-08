@@ -3,6 +3,7 @@ package com.erm.test.cleaner;
 import com.erm.test.cleaner.impl.BasedOnQueryDbStateRestorer;
 import com.erm.test.cleaner.impl.ParsingResult;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import static com.erm.test.cleaner.StatementType.INSERT;
 import static com.erm.test.cleaner.StatementType.SELECT;
+import static com.erm.test.cleaner.StatementType.UPDATE;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -21,7 +23,7 @@ class DbStateRestorerTest {
 
     private static final String TEST_TABLE_NAME = "test";
     private static final String TEST_EXECUTED_QUERY = "query";
-    private static final String TEST_INSERT = "insert";
+    private static final String TEST_INSERT = "test insert";
 
     private ExecutedQueryHolder executedQueryHolder;
     private TableNameExtractor tableNameExtractor;
@@ -54,12 +56,12 @@ class DbStateRestorerTest {
     void shouldRestoreDb() {
         when(executedQueryHolder.getExecutedQueries()).thenReturn(Set.of(TEST_EXECUTED_QUERY));
         when(tableNameExtractor.extractTableName(TEST_EXECUTED_QUERY)).thenReturn(new ParsingResult(Set.of(TEST_TABLE_NAME), INSERT));
-        when(insertQueryHolder.getQueryForTable(TEST_TABLE_NAME)).thenReturn(Optional.empty());
+        when(insertQueryHolder.getQueriesForTable(TEST_TABLE_NAME)).thenReturn(List.of());
 
         dbStateRestorer.restore();
         verify(executedQueryHolder).getExecutedQueries();
         verify(tableNameExtractor).extractTableName(TEST_EXECUTED_QUERY);
-        verify(insertQueryHolder).getQueryForTable(TEST_TABLE_NAME);
+        verify(insertQueryHolder).getQueriesForTable(TEST_TABLE_NAME);
         verify(jdbcTemplate).update("TRUNCATE TABLE " + TEST_TABLE_NAME);
         verify(executedQueryHolder).clean();
         verify(safeCleanWrapper).before();
@@ -70,12 +72,12 @@ class DbStateRestorerTest {
     void shouldRestoreDbWithInsert() {
         when(executedQueryHolder.getExecutedQueries()).thenReturn(Set.of(TEST_EXECUTED_QUERY));
         when(tableNameExtractor.extractTableName(TEST_EXECUTED_QUERY)).thenReturn(new ParsingResult(Set.of(TEST_TABLE_NAME), INSERT));
-        when(insertQueryHolder.getQueryForTable(TEST_TABLE_NAME)).thenReturn(Optional.of(TEST_INSERT));
+        when(insertQueryHolder.getQueriesForTable(TEST_TABLE_NAME)).thenReturn(List.of(TEST_INSERT));
 
         dbStateRestorer.restore();
         verify(executedQueryHolder).getExecutedQueries();
         verify(tableNameExtractor).extractTableName(TEST_EXECUTED_QUERY);
-        verify(insertQueryHolder).getQueryForTable(TEST_TABLE_NAME);
+        verify(insertQueryHolder).getQueriesForTable(TEST_TABLE_NAME);
         verify(jdbcTemplate).update("TRUNCATE TABLE " + TEST_TABLE_NAME);
         verify(jdbcTemplate).update(TEST_INSERT);
         verify(executedQueryHolder).clean();
@@ -86,28 +88,22 @@ class DbStateRestorerTest {
     @Test
     void shouldCreateBackup() {
         when(insertQueryProvider.getInsertQueries())
-                .thenReturn(List.of(TEST_EXECUTED_QUERY));
-        when(tableNameExtractor.extractTableName(TEST_EXECUTED_QUERY))
-                .thenReturn(new ParsingResult(Set.of(TEST_TABLE_NAME), INSERT));
+                .thenReturn(Map.of(TEST_TABLE_NAME, List.of(TEST_EXECUTED_QUERY)));
 
         dbStateRestorer.createBackup();
 
         verify(insertQueryProvider).getInsertQueries();
-        verify(tableNameExtractor).extractTableName(TEST_EXECUTED_QUERY);
         verify(insertQueryHolder).addQueryForTable(TEST_TABLE_NAME, TEST_EXECUTED_QUERY);
     }
 
     @Test
     void shouldNotCreateBackupIfStatementIsNotModifying() {
         when(insertQueryProvider.getInsertQueries())
-                .thenReturn(List.of(TEST_EXECUTED_QUERY));
-        when(tableNameExtractor.extractTableName(TEST_EXECUTED_QUERY))
-                .thenReturn(new ParsingResult(Set.of(TEST_TABLE_NAME), SELECT));
+                .thenReturn(Map.of(TEST_TABLE_NAME, List.of()));
 
         dbStateRestorer.createBackup();
 
         verify(insertQueryProvider).getInsertQueries();
-        verify(tableNameExtractor).extractTableName(TEST_EXECUTED_QUERY);
         verify(insertQueryHolder, never()).addQueryForTable(anyString(), anyString());
     }
 }

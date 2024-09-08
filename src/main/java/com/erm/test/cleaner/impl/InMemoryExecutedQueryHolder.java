@@ -4,7 +4,7 @@ import com.erm.test.cleaner.ExecutedQueryHolder;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ExecutedQueryHolderImpl implements ExecutedQueryHolder {
+public class InMemoryExecutedQueryHolder implements ExecutedQueryHolder {
 
     private final Set<String> executedQueries = new HashSet<>();
 
