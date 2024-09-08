@@ -1,6 +1,5 @@
-package com.ipa.test.cleaner;
+package com.erm.test.cleaner;
 
-import java.util.List;
 import java.util.Set;
 
 public interface ExecutedQueryHolder {

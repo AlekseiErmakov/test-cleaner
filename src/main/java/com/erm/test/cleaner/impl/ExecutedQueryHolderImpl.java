@@ -1,6 +1,6 @@
-package com.ipa.test.cleaner.impl;
+package com.erm.test.cleaner.impl;
 
-import com.ipa.test.cleaner.ExecutedQueryHolder;
+import com.erm.test.cleaner.ExecutedQueryHolder;
 import java.util.HashSet;
 import java.util.Set;
 
