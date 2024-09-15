@@ -42,7 +42,7 @@ public class DbSqlInsertQueryProvider implements InsertQueryProvider {
     }
 
     private void createBackup() throws IOException, InterruptedException {
-        ExecResult execResult = container.execInContainer(backupCommandProvider.createBackupCommand(container));
+        ExecResult execResult = container.execInContainer(backupCommandProvider.createBackupCommand());
         if (execResult.getExitCode() == 1) {
             throw new DbRestoreException("Backup creation failed. Error log: %n. Log: %n. Exit code: %n.", execResult.getStderr(),
                     execResult.getStdout(), execResult.getExitCode());

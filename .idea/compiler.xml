@@ -7,12 +7,19 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="ipa-starter-test-cleaner" />
+        <module name="test-cleaner-spring" />
+        <module name="test-cleaner-spring-boot-starter" />
+        <module name="test-cleaner-api" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="ipa-starter-test-cleaner" options="-parameters" />
+      <module name="starter-test-cleaner" options="" />
+      <module name="test-cleaner-api" options="-parameters" />
+      <module name="test-cleaner-spring" options="-parameters" />
+      <module name="test-cleaner-spring-boot-starter" options="-parameters" />
     </option>
   </component>
 </project>

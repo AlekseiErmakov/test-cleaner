@@ -2,5 +2,10 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/test-cleaner-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/test-cleaner-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/test-cleaner-spring-boot-starter/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/test-cleaner-spring/src/main/java" charset="UTF-8" />
   </component>
 </project>
