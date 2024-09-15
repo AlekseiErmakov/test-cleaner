@@ -1,25 +1,23 @@
 package com.erm.test.cleaner.postgres;
 
+import com.erm.test.cleaner.BackupCommandProvider;
 import com.erm.test.cleaner.BashContainerCommand;
-import com.erm.test.cleaner.LightSqlDumpParser;
-import com.erm.test.cleaner.impl.DbSqlInsertQueryProvider;
 import java.util.List;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.JdbcDatabaseContainer;
 
-public class PostgresDbSqlInsertQueryProvider extends DbSqlInsertQueryProvider {
-
-    private static final String REGEX = "(?ms)^INSERT INTO\\s+([^\\s(]+).*?\\);\\s*$";
-
+public class PostgresDbSqlInsertQueryProvider implements BackupCommandProvider {
+    private final JdbcDatabaseContainer<?> container;
     private final String databaseName;
+    private final String backupFileName;
 
-    public PostgresDbSqlInsertQueryProvider(PostgreSQLContainer<?> container, String backupFileName, String databaseName,
-            LightSqlDumpParser lightSqlDumpParser) {
-        super(container, backupFileName, lightSqlDumpParser);
+    public PostgresDbSqlInsertQueryProvider(JdbcDatabaseContainer<?> container, String databaseName, String backupFileName) {
+        this.container = container;
         this.databaseName = databaseName;
+        this.backupFileName = backupFileName;
     }
 
     @Override
-    protected String[] getCreateBackupCommand() {
+    public String[] createBackupCommand() {
         return BashContainerCommand.builder()
                 .withApplicationName("pgDump")
                 .withArguments(
@@ -27,6 +25,4 @@ public class PostgresDbSqlInsertQueryProvider extends DbSqlInsertQueryProvider {
                 .build()
                 .getCommand();
     }
-
-
 }

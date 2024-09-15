@@ -1,6 +1,4 @@
 package com.erm.test.cleaner;
 
-public interface DbStateRestorer {
-    void restore();
-    void createBackup();
+public interface DbStateRestorer extends StateRestorer {
 }

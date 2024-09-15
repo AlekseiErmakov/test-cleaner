@@ -1,5 +1,6 @@
 package com.erm.test.cleaner.impl;
 
+import com.erm.test.cleaner.BackupCommandProvider;
 import com.erm.test.cleaner.InsertQueryProvider;
 import com.erm.test.cleaner.LightSqlDumpParser;
 import com.erm.test.cleaner.common.exception.DbRestoreException;
@@ -10,16 +11,19 @@ import java.util.Map;
 import org.testcontainers.containers.Container.ExecResult;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 
-public abstract class DbSqlInsertQueryProvider implements InsertQueryProvider {
+public class DbSqlInsertQueryProvider implements InsertQueryProvider {
 
     protected final JdbcDatabaseContainer<?> container;
     protected final String backupFileName;
     private final LightSqlDumpParser lightSqlDumpParser;
+    private final BackupCommandProvider backupCommandProvider;
 
-    public DbSqlInsertQueryProvider(JdbcDatabaseContainer<?> container, String backupFileName, LightSqlDumpParser lightSqlDumpParser) {
+    public DbSqlInsertQueryProvider(JdbcDatabaseContainer<?> container, String backupFileName, LightSqlDumpParser lightSqlDumpParser,
+            BackupCommandProvider backupCommandProvider) {
         this.container = container;
         this.backupFileName = backupFileName;
         this.lightSqlDumpParser = lightSqlDumpParser;
+        this.backupCommandProvider = backupCommandProvider;
     }
 
     @Override
@@ -38,13 +42,11 @@ public abstract class DbSqlInsertQueryProvider implements InsertQueryProvider {
     }
 
     private void createBackup() throws IOException, InterruptedException {
-        ExecResult execResult = container.execInContainer(getCreateBackupCommand());
+        ExecResult execResult = container.execInContainer(backupCommandProvider.createBackupCommand(container));
         if (execResult.getExitCode() == 1) {
             throw new DbRestoreException("Backup creation failed. Error log: %n. Log: %n. Exit code: %n.", execResult.getStderr(),
                     execResult.getStdout(), execResult.getExitCode());
         }
     }
-
-    protected abstract String[] getCreateBackupCommand();
 
 }

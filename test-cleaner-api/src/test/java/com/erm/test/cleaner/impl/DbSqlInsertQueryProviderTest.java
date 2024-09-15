@@ -1,5 +1,6 @@
 package com.erm.test.cleaner.impl;
 
+import com.erm.test.cleaner.BackupCommandProvider;
 import com.erm.test.cleaner.InsertQueryProvider;
 import com.erm.test.cleaner.LightSqlDumpParser;
 import java.util.List;
@@ -30,19 +31,14 @@ class DbSqlInsertQueryProviderTest {
     private InsertQueryProvider provider;
     private JdbcDatabaseContainer<?> container;
     private LightSqlDumpParser parser;
+    private BackupCommandProvider backupCommandProvider;
 
     @BeforeEach
     public void init() {
         parser = mock(LightSqlDumpParser.class);
         container = mock(JdbcDatabaseContainer.class);
-        provider = new DbSqlInsertQueryProvider(container, BACKUP_FILE, parser) {
-
-            @Override
-            protected String[] getCreateBackupCommand() {
-                return CREATE_BACKUP_COMMAND;
-            }
-
-        };
+        backupCommandProvider = mock(BackupCommandProvider.class);
+        provider = new DbSqlInsertQueryProvider(container, BACKUP_FILE, parser, backupCommandProvider){};
     }
 
     @Test
@@ -51,6 +47,7 @@ class DbSqlInsertQueryProviderTest {
         when(container.execInContainer(CREATE_BACKUP_COMMAND)).thenReturn(backupExecutionResult);
         when(backupExecutionResult.getExitCode()).thenReturn(SUCCESS_CODE);
         when(container.copyFileFromContainer(eq(BACKUP_FILE), any(ThrowingFunction.class))).thenReturn(SQL_DUMP);
+        when(backupCommandProvider.createBackupCommand(container)).thenReturn(CREATE_BACKUP_COMMAND);
         Map<String, List<String>> expectedQueries = Map.of(TABLE_NAME, List.of(INSERT_QUERY));
         when(parser.parse(SQL_DUMP)).thenReturn(expectedQueries);
 
