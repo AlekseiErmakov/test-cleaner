@@ -1,4 +1,4 @@
-package com.erm.test.cleaner.db.postgres;
+package com.erm.test.cleaner.postgres;
 
 import com.erm.test.cleaner.BashContainerCommand;
 import com.erm.test.cleaner.LightSqlDumpParser;

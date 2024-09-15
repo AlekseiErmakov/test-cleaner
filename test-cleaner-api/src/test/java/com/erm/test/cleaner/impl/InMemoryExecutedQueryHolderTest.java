@@ -10,7 +10,7 @@ class InMemoryExecutedQueryHolderTest {
 
     private static final String QUERY = "query";
 
-    private InMemoryExecutedQueryHolder inMemoryExecutedQueryHolder = new InMemoryExecutedQueryHolder();
+    private final InMemoryExecutedQueryHolder inMemoryExecutedQueryHolder = new InMemoryExecutedQueryHolder();
 
     @Test
     void shouldAddQuery() {
